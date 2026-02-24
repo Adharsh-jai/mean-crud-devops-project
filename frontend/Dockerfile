@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-# ----------------------------
-# Stage 1: Build Angular App
-# ----------------------------
+
 FROM node:18-alpine AS build
-=======
-# Stage 1: Build Angular
-FROM node:16 as build
->>>>>>> 1f7e8a15efcc9e4f0779520dc389319ffb3e4382
+
+
 
 WORKDIR /app
 
