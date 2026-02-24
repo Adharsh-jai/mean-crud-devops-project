@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKERHUB_USERNAME = "groot321"
         DOCKERHUB_CREDENTIALS = "groot321"
-        PROJECT_DIR = "/home/ubuntu/mean-app"
+        PROJECT_DIR = "/home/Groot/home/crud-dd-task-mean-app"
     }
 
     stages {
