@@ -1,20 +1,20 @@
-
+# ----------------------------
+# Stage 1: Build Angular App
+# ----------------------------
 FROM node:18-alpine AS build
-
-
 
 WORKDIR /app
 
-# Copy package files
+# Copy only package files first (better layer caching)
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (cleaner for CI)
+RUN npm ci
 
-# Copy full project
+# Copy remaining project files
 COPY . .
 
-# Build Angular for production
+# Build Angular production build
 RUN npm run build -- --configuration production
 
 
@@ -23,17 +23,18 @@ RUN npm run build -- --configuration production
 # ----------------------------
 FROM nginx:alpine
 
-# Remove default nginx config
+# Remove default Nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Copy our custom nginx config
+# Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy Angular build output
+# ⚠ Ensure folder name matches your angular.json outputPath
 COPY --from=build /app/dist/angular-15-crud/ /usr/share/nginx/html/
 
-# Expose port 80
+# Expose container port
 EXPOSE 80
 
-# Start nginx
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
