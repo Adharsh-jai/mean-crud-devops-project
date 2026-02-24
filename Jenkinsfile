@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = "dockerhub-credentials"
         DOCKERHUB_USERNAME = "groot321"
+        DOCKERHUB_CREDENTIALS = "groot321"
         PROJECT_DIR = "/home/ubuntu/mean-app"
     }
 
@@ -21,25 +21,27 @@ pipeline {
             }
         }
 
-        stage('Login to DockerHub') {
+        stage('Login to DockerHub Securely') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: "${DOCKERHUB_CREDENTIALS}",
-                    usernameVariable: 'USERNAME',
-                    passwordVariable: 'PASSWORD'
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    '''
                 }
             }
         }
 
-        stage('Push Images') {
+        stage('Push Images to DockerHub') {
             steps {
                 sh 'docker compose push'
             }
         }
 
-        stage('Deploy Application') {
+        stage('Deploy Latest Images') {
             steps {
                 sh """
                 cd ${PROJECT_DIR}
@@ -47,6 +49,12 @@ pipeline {
                 docker compose down
                 docker compose up -d
                 """
+            }
+        }
+
+        stage('Docker Logout') {
+            steps {
+                sh 'docker logout'
             }
         }
     }
