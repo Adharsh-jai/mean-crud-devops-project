@@ -1,16 +1,21 @@
-# Build Angular
-FROM node:18 AS build
+# Stage 1: Build Angular
+FROM node:18 as build
 
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build
+RUN npm run build -- --configuration production
 
-# Serve with Nginx
+# Stage 2: Serve with Nginx
 FROM nginx:alpine
 
-COPY --from=build /app/dist/ /usr/share/nginx/html
+# Remove default nginx files
+RUN rm -rf /usr/share/nginx/html/*
+
+# IMPORTANT: Copy correct Angular build folder
+COPY --from=build /app/dist/angular-15-crud/ /usr/share/nginx/html/
 
 EXPOSE 80

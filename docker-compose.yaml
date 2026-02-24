@@ -1,9 +1,9 @@
-version: '3.8'
+version: "3.8"
 
 services:
 
   mongodb:
-    image: mongo
+    image: mongo:4.4
     container_name: mongodb
     restart: always
     ports:
@@ -13,17 +13,20 @@ services:
 
   backend:
     build: ./backend
+    image: groot321/node-backend:latest
     container_name: backend
     restart: always
     ports:
-      - "8080:8080"
+      - "7070:7070"
     depends_on:
       - mongodb
     environment:
-      - DB_HOST=mongodb
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://mongodb:27017/yourdbname
 
   frontend:
     build: ./frontend
+    image: groot321/angular-frontend:latest
     container_name: frontend
     restart: always
     ports:
